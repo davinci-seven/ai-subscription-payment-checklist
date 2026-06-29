@@ -58,6 +58,27 @@ Reference pages:
 
 No card can guarantee payment success. Test with a small balance first.
 
+## Region-aware virtual card comparison
+
+The best virtual card for AI subscriptions depends on region, funding method, KYC fit, recurring billing support and renewal reliability.
+
+Common comparison patterns:
+
+| User situation | Common options to compare | Notes |
+|---|---|---|
+| US users | Privacy.com, bank-issued virtual cards | Often useful for merchant-locked cards and spending limits |
+| EU / UK users | Revolut, Wise, bank virtual cards | Good for mainstream international subscriptions when available |
+| China-based users | VCard, OneKey, WildCard, Depay/DuPay-style cards, NobePay-style providers | Check current availability, KYC, fees, funding method and renewal reports |
+| Developers using API billing | Dedicated card, backup card, usage limits | API billing can grow faster than fixed subscriptions |
+
+Use a virtual card as a controlled payment method, not as a guaranteed workaround. If the issuer, billing address, authentication, invoice status or account risk is the real problem, switching cards alone may not fix the payment.
+
+Related comparison:
+
+- https://aipaymentfix.com/guides/virtual-card-comparison-for-ai-subscriptions/
+- https://aipaymentfix.com/guides/ai-subscription-payment-checklist/
+- https://aipaymentfix.com/blog/how-to-pay-for-openai-api-from-china/
+
 ## What this repo does not recommend
 
 - Fake billing details
