@@ -1,0 +1,161 @@
+# AI订阅支付排障清单
+
+[English](README.md) | [简体中文](README.zh-CN.md)
+
+这是一个公开、实用的AI订阅支付排障库。
+
+目的很简单：付款失败时，先判断到底卡在哪一层，再决定要不要换卡。
+
+目前覆盖ChatGPT Plus、Claude Pro、Cursor Pro、OpenAI API、Grok，以及类似的AI/SaaS订阅付款问题。
+
+## 先看这里
+
+付款失败后，按这个顺序排：
+
+1. **先确认付款渠道**：网页支付、Apple App Store、Google Play、workspace/team账单，还是API账单。
+2. **先留证据**：保存完整报错、UTC时间、invoice/transaction ID（如果有），并记清楚这是首笔付款还是续费。
+3. **查银行/发卡方有没有看到authorization授权请求。**
+4. **银行看到了授权请求**：重点查余额、限额、国际/线上/循环付款设置、安全拦截和身份验证。
+5. **银行完全没看到授权请求**：不要直接认定是银行拒付。问题可能在请求到达银行之前就被平台、账单系统或风控拦住了。
+6. **一次只改一个变量**：连续换卡、换账号、换地区、换地址，只会把排错现场搅乱。
+
+## 最有用的一刀：银行到底看没看到授权
+
+### 银行/发卡方看到了authorization
+
+先查卡和发卡方这一侧：
+
+- 余额是否足够，是否留出了税费或临时预授权空间
+- 是否允许线上付款、国际付款、循环订阅
+- 单日限额、外币限额是否够
+- 银行有没有安全拦截
+- 3D Secure或其他验证能否完成
+- 账单姓名、地址、邮编和卡片状态是否正常
+
+### 银行/发卡方完全没看到authorization
+
+这应该按另一类问题处理。
+
+可能出在：
+
+- 付款渠道搞错
+- 未付invoice或billing profile状态异常
+- 账号或平台侧风控
+- 地区、地址、卡片资格不匹配
+- 卡类型或BIN不被商户接受
+- checkout/session在进入银行授权前就失败
+
+这里说的是排障假设，不代表已经确认根因。如果同一个错误持续出现，保存好证据，再走平台官方support。
+
+## 各平台清单
+
+| 产品 | 中文清单 | 第一件该问的事 |
+|---|---|---|
+| ChatGPT Plus | [zh-CN/checklists/chatgpt-plus.md](zh-CN/checklists/chatgpt-plus.md) | 到底是网页、Apple还是Google Play付款？ |
+| Claude Pro | [zh-CN/checklists/claude-pro.md](zh-CN/checklists/claude-pro.md) | 账号/地区是否可用，卡是否支持国际循环付款？ |
+| Cursor Pro | [zh-CN/checklists/cursor-pro.md](zh-CN/checklists/cursor-pro.md) | 有没有未付invoice，属于个人还是workspace账单？ |
+| OpenAI API | [zh-CN/checklists/openai-api.md](zh-CN/checklists/openai-api.md) | 这是不是API账单？银行到底有没有看到授权？ |
+| Grok | [zh-CN/checklists/grok.md](zh-CN/checklists/grok.md) | 是网页还是应用商店付款？银行看到授权了吗？ |
+
+英文原版仍保留在[checklists](checklists/)目录。
+
+## 常见故障长什么样
+
+| 现象 | 可能意味着什么 | 第一动作 |
+|---|---|---|
+| 显示card declined，银行也看到了授权 | 发卡方拦截、余额/限额不足、验证失败或卡片限制 | 查银行App/support和具体授权结果 |
+| 显示card declined，但银行什么都没看到 | 可能在到达银行之前就失败了 | 查付款渠道、账号/账单状态、地区和卡片资格 |
+| 首次付款成功，续费失败 | 余额、有效期、循环付款限制或平台风控变化 | 查续费日期、余额和循环付款设置 |
+| API绑卡/扣款失败 | API账单状态、spending limit、卡片资格或平台风险检查 | 先看API billing页面，再保存完整报错 |
+| Cursor有未付invoice | 旧账单或workspace状态挡住新checkout | 先处理未付账单 |
+| 看起来像地区问题 | 付款渠道不支持、发卡方限制或账号/账单资料不一致 | 先确认官方支持范围，保持资料真实一致 |
+
+## 几条特别省时间的规则
+
+- 一张卡能付ChatGPT，不代表它就一定能付Claude、Cursor或Grok。
+- 首笔扣款成功，不代表下个月续费一定成功。
+- 排错期间不要对同一个失败付款连续狂点重试。
+- 不要同时换卡、账号、地区、地址、网络，否则即使下一次成功，你也不知道到底改对了什么。
+- 能保存的报错、截图、UTC时间、transaction/invoice ID都留着。
+- 没有任何一张卡能保证100%通过。
+
+## 虚拟卡什么时候可能有用
+
+虚拟卡比较适合这些情况：
+
+- 本地银行卡不支持国际AI订阅
+- 想把AI/SaaS支出和主银行卡分开
+- 想用低余额卡控制循环订阅风险
+- 主卡不支持线上循环付款
+
+但下面这些问题，换虚拟卡也未必能解决：
+
+- 账号或billing profile本身有问题
+- 付款渠道选错了
+- 平台不支持当前账号/地区/付款路径
+- 卡BIN或卡类型被拒
+- 身份验证或账单地址校验失败
+- 旧invoice没有处理
+
+虚拟卡是支付工具，不是“万能绕过器”。
+
+## 测试一张新卡时
+
+正常订阅用途建议这样做：
+
+1. 先放小额余额。
+2. 先测一个商户。
+3. 记录第一次成功扣款。
+4. 记下续费日期。
+5. 至少观察一次真实续费，再判断这张卡是否适合长期使用。
+6. 搞清楚开卡费、充值费、退款/提现路径和客服，再决定要不要放更多余额。
+
+## 公开求助时别把自己脱光
+
+如果要对比案例、开GitHub Issue或者公开求助，可以直接套用[中文支付失败报告模板](zh-CN/docs/payment-failure-report-template.md)。
+
+这些东西不要发：
+
+- 完整卡号
+- CVV
+- 完整账单地址
+- 身份证件
+- API Key
+- 密码、恢复码
+- 没打码的敏感截图
+
+## 项目入口
+
+- 支付故障详细文章：https://aipaymentfix.com/
+- 中文虚拟卡资料/笔记：https://info.vcardvirtual.cc/
+- X / 更新记录：https://x.com/davinci_seven
+
+这个仓库和**@davinci_seven / 达芬七**关联。很多X上反复出现的“为什么这张卡不行”“为什么首刷成功续费失败”“银行为什么连记录都没有”的问题，会逐步沉淀到这里，不用每次重新讲一遍。
+
+## VCard / 合作说明
+
+VCard是我测试和可能推广的虚拟卡选项之一，主要用于正常AI订阅场景。部分合作注册可能会给我带来收益。
+
+但这不改变这个repo的排障顺序：**先诊断，再比较方案，最后小额测试。**
+
+任何支付方式都不能保证成功。
+
+## 这个repo不建议做什么
+
+- 填假账单资料
+- 虚报居住地
+- 用VPN伪装地区或绕过平台审核
+- 批量养号
+- 为了绕过平台决定不断轮换卡片
+- 滥用chargeback
+- 套现
+- 没测试就放大额资金
+
+## 继续看
+
+- [通用支付诊断框架](zh-CN/docs/diagnostic-framework.md)
+- [支付失败报告模板](zh-CN/docs/payment-failure-report-template.md)
+
+## License
+
+MIT
