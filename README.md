@@ -1,5 +1,7 @@
 # AI Subscription Payment Checklist
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 A practical, public troubleshooting library for failed AI subscription payments.
 
 The goal is simple: diagnose the failure before blindly trying another card.
